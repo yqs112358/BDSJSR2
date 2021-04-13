@@ -265,10 +265,10 @@ namespace CSR
 
 	[StructLayoutAttribute(LayoutKind.Sequential)]
 	public struct Std_String {
-		public IntPtr data;
-		public ulong sd;
-		public ulong len;
-		public ulong uk3;
+		public IntPtr data;			// 数据区
+		public ulong sd;			// 短数据复用区
+		public ulong len;			// 字符串长度
+		public ulong alloclen;		// 实占空间
 	}
 
 
@@ -301,7 +301,7 @@ namespace CSR
 			{
 				if (s.len < 1)
 					return String.Empty;
-				if (s.len < 16)
+				if (s.alloclen < 16)
 				{
 					byte[] c = BitConverter.GetBytes((ulong)s.data);
 					byte[] d = BitConverter.GetBytes(s.sd);
@@ -1162,6 +1162,7 @@ namespace CSR
 		protected int mentityid;
 		protected int mdimensionid;
 		protected IntPtr mnpc;
+		protected IntPtr mtrigger;
 		/// <summary>
 		/// NPC名字
 		/// </summary>
@@ -1198,6 +1199,10 @@ namespace CSR
 		/// NPC指针
 		/// </summary>
 		public IntPtr npcPtr { get { return mnpc; } }
+		/// <summary>
+		/// 触发者（玩家）指针
+		/// </summary>
+		public IntPtr triggerPtr { get { return mtrigger; } }
 		public static new NpcCmdEvent getFrom(Events e)
 		{
 			var le = createHead(e, EventType.onNpcCmd, typeof(NpcCmdEvent)) as NpcCmdEvent;
@@ -1213,6 +1218,7 @@ namespace CSR
 			le.mentityid = Marshal.ReadInt32(s, 48);
 			le.mdimensionid = Marshal.ReadInt32(s, 52);
 			le.mnpc = Marshal.ReadIntPtr(s, 56);
+			le.mtrigger = Marshal.ReadIntPtr(s, 64);
 			return le;
 		}
 	}
